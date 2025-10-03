@@ -1,0 +1,30 @@
+/* index.css */
+@import "tailwindcss";
+
+:root {
+  --primary: #2c3e50;
+  --secondary: #34495e;
+  --accent: #3498db;
+  --success: #27ae60;
+  --warning: #f39c12;
+  --error: #e74c3c;
+  --background: #ecf0f1;
+  --surface: #ffffff;
+  --text-primary: #2c3e50;
+  --text-secondary: #7f8c8d;
+  --border: #bdc3c7;
+}
+
+@theme {
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-text-dark: var(--text-primary);
+  --color-text-light: var(--text-secondary);
+  --color-border: var(--border);
+}
