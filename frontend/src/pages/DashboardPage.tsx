@@ -1,24 +1,44 @@
 // pages/DashboardPage.tsx
-import React from 'react';
+import { useMemo } from 'react';
+import { useTheme } from '../contexts/ThemeContext';
 import DocumentCard from '../components/DocumentCard';
 import MetricCard from '../components/MetricCard';
 import FileUpload from '../components/FileUpload';
 import { useDocuments } from '../hooks/useDocuments';
 
 const DashboardPage: React.FC = () => {
+  const { currentTheme } = useTheme();
+  const isDarkMode = currentTheme.id === 'dark';
   const { data: documents, isLoading, error } = useDocuments();
 
-  const metrics = [
-    { title: 'Total Documents', value: 142, trend: 12, icon: '📚' },
-    { title: 'Processed', value: 118, trend: 8, icon: '✅' },
-    { title: 'In Progress', value: 19, trend: 4, icon: '🔄' },
-    { title: 'Errors', value: 5, trend: -3, icon: '❌' },
-  ];
+  // Calculate real metrics from actual documents
+  const metrics = useMemo(() => {
+    if (!documents) {
+      return [
+        { title: 'Total Documents', value: 0, trend: 0, icon: '📚' },
+        { title: 'Processed', value: 0, trend: 0, icon: '✅' },
+        { title: 'In Progress', value: 0, trend: 0, icon: '🔄' },
+        { title: 'Errors', value: 0, trend: 0, icon: '❌' },
+      ];
+    }
+
+    const total = documents.length;
+    const processed = documents.filter(d => d.status === 'processed').length;
+    const inProgress = documents.filter(d => d.status === 'processing' || d.status === 'queued').length;
+    const errors = documents.filter(d => d.status === 'error').length;
+
+    return [
+      { title: 'Total Documents', value: total, trend: 0, icon: '📚' },
+      { title: 'Processed', value: processed, trend: 0, icon: '✅' },
+      { title: 'In Progress', value: inProgress, trend: 0, icon: '🔄' },
+      { title: 'Errors', value: errors, trend: 0, icon: '❌' },
+    ];
+  }, [documents]);
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-text-dark">Loading documents...</div>
+        <div className={isDarkMode ? 'text-white' : 'text-text-dark'}>Loading documents...</div>
       </div>
     );
   }
@@ -34,14 +54,20 @@ const DashboardPage: React.FC = () => {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-text-dark">Dashboard</h1>
+          <h1 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-text-dark'}`}>
+            Dashboard
+          </h1>
           <p className="text-text-light mt-2">Welcome to your document intelligence dashboard</p>
         </div>
-        <div className="mt-4 lg:mt-0">
-          <FileUpload />
-        </div>
+      </div>
+
+      {/* File Upload Section */}
+      <div className={`rounded-xl shadow-sm border p-6 ${
+        isDarkMode ? 'bg-surface border-surface-muted' : 'bg-surface border-border'
+      }`}>
+        <FileUpload />
       </div>
 
       {/* Metrics Grid */}
@@ -52,14 +78,24 @@ const DashboardPage: React.FC = () => {
       </div>
 
       {/* Documents Section */}
-      <div className="bg-surface rounded-xl shadow-sm border border-border">
-        <div className="p-6 border-b border-border flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="text-xl font-semibold text-text-dark">Recent Documents</h2>
+      <div className={`rounded-xl shadow-sm border ${
+        isDarkMode ? 'bg-surface border-surface-muted' : 'bg-surface border-border'
+      }`}>
+        <div className={`p-6 border-b flex flex-col sm:flex-row sm:items-center sm:justify-between ${
+          isDarkMode ? 'border-surface-muted' : 'border-border'
+        }`}>
+          <h2 className={`text-xl font-semibold ${
+            isDarkMode ? 'text-white' : 'text-text-dark'
+          }`}>Recent Documents</h2>
           <div className="flex space-x-2 mt-3 sm:mt-0">
             <button className="bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-secondary transition-colors">
               Active
             </button>
-            <button className="px-4 py-2 text-text-light hover:bg-background rounded-lg transition-colors">
+            <button className={`px-4 py-2 rounded-lg transition-colors ${
+              isDarkMode 
+                ? 'text-text-muted hover:bg-surface-muted/30'
+                : 'text-text-light hover:bg-background'
+            }`}>
               Archived
             </button>
           </div>
@@ -69,7 +105,9 @@ const DashboardPage: React.FC = () => {
           {documents?.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">📄</div>
-              <h3 className="text-lg font-medium text-text-dark mb-2">No documents yet</h3>
+              <h3 className={`text-lg font-medium mb-2 ${
+                isDarkMode ? 'text-white' : 'text-text-dark'
+              }`}>No documents yet</h3>
               <p className="text-text-light">Upload your first document to get started</p>
             </div>
           ) : (

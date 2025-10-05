@@ -3,6 +3,7 @@ import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AuthProvider, useAuthContext } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import DashboardPage from './pages/DashboardPage';
@@ -74,10 +75,12 @@ const AppContent: React.FC = () => {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <AppContent />
-        <ReactQueryDevtools initialIsOpen={false} />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <AppContent />
+          <ReactQueryDevtools initialIsOpen={false} />
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

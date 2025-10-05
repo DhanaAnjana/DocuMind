@@ -1,5 +1,6 @@
-// components/Sidebar.tsx
-import React from 'react';
+// src/components/Sidebar.tsx
+import { LayoutDashboard, FileText, Search, User, ChevronRight } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface SidebarProps {
   activeView: string;
@@ -7,80 +8,123 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
+  const { currentTheme } = useTheme();
+  const isDarkMode = currentTheme.id === 'dark';
+
   const menuItems = [
     { 
       id: 'dashboard', 
       label: 'Dashboard', 
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z" />
-        </svg>
-      )
+      icon: LayoutDashboard,
+      badge: null
     },
     { 
       id: 'documents', 
       label: 'Documents', 
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      )
+      icon: FileText,
+      badge: '12'
     },
     { 
       id: 'searchqa', 
       label: 'Search & Q&A', 
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-      )
+      icon: Search,
+      badge: null
     },
     { 
       id: 'account', 
       label: 'Account', 
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
-      )
+      icon: User,
+      badge: null
     },
   ];
 
   return (
-    <div className="w-64 bg-white border-r border-gray-200 min-h-screen p-6">      
-      <nav className="mt-6">
-        <ul className="space-y-2">
-          {menuItems.map(item => (
-            <li key={item.id}>
+    <aside className={`w-72 border-r border-border min-h-screen p-6 flex flex-col ${
+      isDarkMode ? 'bg-surface' : 'bg-white'
+    }`}>
+      {/* Navigation Menu */}
+      <nav className="flex-1 mt-8">
+        <div className="space-y-1.5">
+          {menuItems.map(item => {
+            const Icon = item.icon;
+            const isActive = activeView === item.id;
+            
+            return (
               <button
+                key={item.id}
                 onClick={() => setActiveView(item.id)}
-                className="flex items-center w-full p-3 rounded-lg transition-all duration-200 text-left"
-                style={
-                  activeView === item.id 
-                    ? { backgroundColor: '#2c3e50', color: 'white' }
-                    : { color: '#374151' }
-                }
-                onMouseEnter={(e) => {
-                  if (activeView !== item.id) {
-                    e.currentTarget.style.backgroundColor = '#ecf0f1';
-                    e.currentTarget.style.color = '#2c3e50';
+                className={`
+                  group relative w-full flex items-center justify-between p-3.5 rounded-xl 
+                  transition-all duration-200 font-medium text-sm
+                  ${isActive 
+                    ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-medium' 
+                    : isDarkMode
+                      ? 'text-text-muted hover:bg-surface-muted/30 hover:text-white'
+                      : 'text-text-secondary hover:bg-surface-muted/50 hover:text-primary'
                   }
-                }}
-                onMouseLeave={(e) => {
-                  if (activeView !== item.id) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = '#374151';
-                  }
-                }}
+                `}
               >
-                <span className="mr-3">{item.icon}</span>
-                <span className="font-medium">{item.label}</span>
+                <div className="flex items-center space-x-3">
+                  <Icon className={`w-5 h-5 ${
+                    isActive 
+                      ? 'text-white' 
+                      : isDarkMode 
+                        ? 'text-text-muted group-hover:text-white' 
+                        : 'text-text-muted group-hover:text-primary'
+                  } transition-colors`} />
+                  <span>{item.label}</span>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  {item.badge && (
+                    <span className={`
+                      px-2 py-0.5 rounded-full text-xs font-semibold
+                      ${isActive 
+                        ? 'bg-white/20 text-white' 
+                        : 'bg-accent/10 text-accent'
+                      }
+                    `}>
+                      {item.badge}
+                    </span>
+                  )}
+                  {isActive && (
+                    <ChevronRight className="w-4 h-4 text-white" />
+                  )}
+                </div>
               </button>
-            </li>
-          ))}
-        </ul>
+            );
+          })}
+        </div>
       </nav>
-    </div>
+
+      {/* Storage Usage Card */}
+      <div className={`mt-auto pt-6 border-t ${
+        isDarkMode ? 'border-surface-muted' : 'border-border'
+      }`}>
+        <div className={`rounded-xl p-4 border ${
+          isDarkMode 
+            ? 'bg-surface-muted/20 border-surface-muted' 
+            : 'bg-gradient-to-br from-accent/10 to-secondary/10 border-accent/20'
+        }`}>
+          <div className="flex items-center justify-between mb-2">
+            <span className={`text-sm font-medium ${
+              isDarkMode ? 'text-white' : 'text-text-primary'
+            }`}>Storage</span>
+            <span className={`text-xs ${
+              isDarkMode ? 'text-text-muted' : 'text-text-muted'
+            }`}>42%</span>
+          </div>
+          <div className={`w-full rounded-full h-2 overflow-hidden ${
+            isDarkMode ? 'bg-surface-muted/50' : 'bg-white/50'
+          }`}>
+            <div className="bg-gradient-to-r from-primary to-accent h-full rounded-full transition-all duration-500" style={{ width: '42%' }}></div>
+          </div>
+          <p className={`text-xs mt-2 ${
+            isDarkMode ? 'text-text-muted' : 'text-text-muted'
+          }`}>4.2 GB of 10 GB used</p>
+        </div>
+      </div>
+    </aside>
   );
 };
 

@@ -1,52 +1,36 @@
-/* App.css */
+/* App.css or index.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --primary: #2c3e50;
-  --secondary: #34495e;
-  --accent: #3498db;
+  --primary: #6B3F69;
+  --secondary: #8D5F8C;
+  --accent: #A376A2;
+  --background: #FFF5F7;
+  --surface: #FFFFFF;
+  --surface-muted: #DDC3C3;
   --success: #27ae60;
   --warning: #f39c12;
   --error: #e74c3c;
-  --background: #ecf0f1;
-  --surface: #ffffff;
-  --text-primary: #2c3e50;
-  --text-secondary: #7f8c8d;
-  --border: #bdc3c7;
-}
-
-/* Dark mode colors */
-[data-theme="dark"] {
-  --primary: #3498db;
-  --secondary: #2980b9;
-  --accent: #1abc9c;
-  --success: #27ae60;
-  --warning: #f39c12;
-  --error: #e74c3c;
-  --background: #1a1a1a;
-  --surface: #2d2d2d;
-  --text-primary: #ffffff;
-  --text-secondary: #b3b3b3;
-  --border: #404040;
+  --text-primary: #2d1b2e;
+  --text-secondary: #6B3F69;
+  --text-muted: #8D5F8C;
+  --border: #DDC3C3;
 }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--background);
   color: var(--text-primary);
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -54,35 +38,10 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
+  background: var(--accent);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary);
-}
-
-/* Focus styles */
-*:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-/* Animation classes */
-.fade-in {
-  animation: fadeIn 0.3s ease-in;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.slide-in {
-  animation: slideIn 0.3s ease-out;
-}
-
-@keyframes slideIn {
-  from { transform: translateX(-100%); }
-  to { transform: translateX(0); }
+  background: var(--secondary);
 }

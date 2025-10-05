@@ -1,5 +1,5 @@
 // src/contexts/AuthContext.tsx
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 export interface User {
   id: string;
@@ -56,12 +56,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (email: string, password: string, name: string) => {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
+    // Simulate saving password (for demonstration only, do not store plain passwords in production)
     const userData: User = {
       id: Math.random().toString(36).substr(2, 9),
       email: email,
       name: name,
       role: 'User'
     };
+    // Optionally store password in localStorage for demonstration (remove in production)
+    localStorage.setItem('user_password', password);
     setUser(userData);
     localStorage.setItem('user_data', JSON.stringify(userData));
   };

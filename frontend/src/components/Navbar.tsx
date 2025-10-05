@@ -1,84 +1,127 @@
-// components/Navbar.tsx
-import React, { useState } from 'react';
+// src/components/Navbar.tsx
+import { useState } from 'react';
 import { useAuthContext } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
+import { Search, LogOut } from 'lucide-react';
+import ThemeSelector from './ThemeSelector';
+import Notifications from './Notifications';
 
 const Navbar = () => {
   const { user, logout } = useAuthContext();
+  const { currentTheme } = useTheme();
+  const isDarkMode = currentTheme.id === 'dark';
   const [showDropdown, setShowDropdown] = useState(false);
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200 py-4 px-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#2c3e50' }}>
-            <svg 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              className="w-6 h-6"
-              stroke="white"
-              strokeWidth="2"
-            >
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-              <circle cx="12" cy="12" r="3" fill="white"/>
-              <path d="M12 8v8M8 12h8" strokeLinecap="round"/>
-            </svg>
+    <nav className={`shadow-soft border-b border-border sticky top-0 z-50 ${
+      isDarkMode ? 'bg-surface' : 'bg-white'
+    }`}>
+      <div className="px-6 py-4">
+        <div className="flex items-center justify-between">
+          {/* Logo Section */}
+          <div className="flex items-center space-x-3">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-medium">
+              <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6" stroke="white" strokeWidth="2.5">
+                <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-primary tracking-tight">DocIntel</h1>
+              <p className={`text-xs ${isDarkMode ? 'text-text-muted' : 'text-text-muted'}`}>
+                Document Intelligence
+              </p>
+            </div>
           </div>
-          <h1 className="text-2xl font-bold docintel-title">DocIntel</h1>
-        </div>
 
-        <div className="relative hidden md:block">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+          {/* Search Bar */}
+          <div className="hidden md:flex flex-1 max-w-xl mx-8">
+            <div className="relative w-full group">
+              <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 transition-colors ${
+                isDarkMode 
+                  ? 'text-text-muted group-focus-within:text-primary' 
+                  : 'text-text-muted group-focus-within:text-primary'
+              }`} />
+              <input
+                type="text"
+                placeholder="Search documents..."
+                className={`w-full pl-12 pr-4 py-3 border border-transparent rounded-xl text-sm 
+                         focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 
+                         transition-all duration-200 ${
+                  isDarkMode
+                    ? 'bg-surface-muted/30 text-white placeholder:text-text-muted focus:bg-surface-muted'
+                    : 'bg-surface-muted/30 text-text-primary placeholder:text-text-muted focus:bg-white'
+                }`}
+              />
+            </div>
           </div>
-          <input
-            type="text"
-            placeholder="Search documents..."
-            className="pl-10 pr-4 py-2 w-80 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 custom-focus-ring"
-            onFocus={(e) => e.target.style.borderColor = '#3498db'}
-            onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-          />
-        </div>
 
-        <div className="flex items-center space-x-4">
-          <button
-            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-            title="Notifications"
-            aria-label="Notifications"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
-          </button>
-          
-          <div className="relative">
-            <button
-              onClick={() => setShowDropdown(!showDropdown)}
-              className="flex items-center space-x-3 hover:bg-gray-100 p-2 rounded-lg transition-colors"
-            >
-              <div className="text-right">
-                <p className="text-sm font-medium text-gray-800">{user?.name || 'User'}</p>
-                <p className="text-xs text-gray-500">{user?.role || 'Member'}</p>
-              </div>
-              <div className="w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm text-white" style={{ backgroundColor: '#2c3e50' }}>
-                {user?.name?.charAt(0).toUpperCase() || 'U'}
-              </div>
-            </button>
+          {/* Right Section */}
+          <div className="flex items-center space-x-3">
+            {/* Theme Selector */}
+            <ThemeSelector />
 
-            {showDropdown && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                <button
-                  onClick={() => {
-                    logout();
-                    setShowDropdown(false);
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                >
-                  Sign Out
-                </button>
-              </div>
-            )}
+            {/* Notifications */}
+            <Notifications />
+
+            {/* User Menu */}
+            <div className="relative">
+              <button
+                onClick={() => setShowDropdown(!showDropdown)}
+                className={`flex items-center space-x-3 px-3 py-2 rounded-xl transition-all duration-200 group ${
+                  isDarkMode
+                    ? 'hover:bg-surface-muted/50'
+                    : 'hover:bg-surface-muted/50'
+                }`}
+              >
+                <div className="text-right hidden sm:block">
+                  <p className={`text-sm font-semibold transition-colors ${
+                    isDarkMode
+                      ? 'text-white group-hover:text-primary'
+                      : 'text-text-primary group-hover:text-primary'
+                  }`}>
+                    {user?.name || 'User'}
+                  </p>
+                  <p className="text-xs text-text-muted">{user?.role || 'Member'}</p>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center font-semibold text-sm shadow-medium group-hover:shadow-large transition-all duration-200">
+                  {user?.name?.charAt(0).toUpperCase() || 'U'}
+                </div>
+              </button>
+
+              {/* Dropdown Menu */}
+              {showDropdown && (
+                <>
+                  <div 
+                    className="fixed inset-0 z-40" 
+                    onClick={() => setShowDropdown(false)}
+                  />
+                  <div className={`absolute right-0 mt-2 w-56 rounded-xl shadow-large border py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200 ${
+                    isDarkMode
+                      ? 'bg-surface border-surface-muted'
+                      : 'bg-white border-border'
+                  }`}>
+                    <div className={`px-4 py-3 border-b ${
+                      isDarkMode ? 'border-surface-muted' : 'border-border'
+                    }`}>
+                      <p className={`text-sm font-semibold ${
+                        isDarkMode ? 'text-white' : 'text-text-primary'
+                      }`}>{user?.name}</p>
+                      <p className="text-xs text-text-muted">{user?.email}</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setShowDropdown(false);
+                      }}
+                      className="w-full flex items-center space-x-2 px-4 py-2.5 text-sm text-error hover:bg-error/5 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
