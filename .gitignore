@@ -19,6 +19,11 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
 
 # Environment
 .env
@@ -26,12 +31,19 @@ wheels/
 env/
 venv/
 ENV/
+.env.*
+!.env.example
 
 # IDE
 .idea/
 .vscode/
 *.swp
 *.swo
+*.sublime-workspace
+*.sublime-project
+.settings/
+.project
+.classpath
 
 # Project specific
 data/uploads/*
@@ -43,7 +55,89 @@ data/logs/*
 
 # Docker
 .docker/
+*.env.docker
+docker-compose.override.yml
 
 # Database
 *.db
 *.sqlite3
+*.sqlite
+*.psql
+*.psql.gz
+*.dump
+postgres-data/
+
+# Frontend
+node_modules/
+.pnp/
+.pnp.js
+coverage/
+.next/
+out/
+build/
+dist/
+.DS_Store
+*.pem
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.eslintcache
+.vercel
+
+# Cache and Temporary files
+*.log
+*.cache
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+*.bak
+*.swp
+*.tmp
+*~
+temp/
+tmp/
+
+# ML/AI specific
+*.ckpt
+*.pth
+*.h5
+*.model
+*.bin
+*.vec
+*.npy
+*.npz
+models/
+wandb/
+runs/
+checkpoints/
+
+# Documentation
+docs/_build/
+site/
+
+# Compiled files
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.pyc
+
+# Certificates and Keys
+*.pem
+*.key
+*.crt
+*.cer
+*.der
+*.priv
+
+# OS specific
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
