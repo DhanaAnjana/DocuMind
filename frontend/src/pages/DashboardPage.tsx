@@ -16,22 +16,18 @@ const DashboardPage: React.FC = () => {
     if (!documents) {
       return [
         { title: 'Total Documents', value: 0, trend: 0, icon: '📚' },
-        { title: 'Processed', value: 0, trend: 0, icon: '✅' },
-        { title: 'In Progress', value: 0, trend: 0, icon: '🔄' },
-        { title: 'Errors', value: 0, trend: 0, icon: '❌' },
+        { title: 'Total Pages', value: 0, trend: 0, icon: '📄' },
+        { title: 'Processed Chunks', value: 0, trend: 0, icon: '🔄' },
+        { title: 'PDF Documents', value: 0, trend: 0, icon: '📋' },
       ];
     }
 
     const total = documents.length;
-    const processed = documents.filter(d => d.status === 'processed').length;
-    const inProgress = documents.filter(d => d.status === 'processing' || d.status === 'queued').length;
-    const errors = documents.filter(d => d.status === 'error').length;
+    const totalChunks = documents.reduce((acc, doc) => acc + doc.chunks.length, 0);
 
     return [
       { title: 'Total Documents', value: total, trend: 0, icon: '📚' },
-      { title: 'Processed', value: processed, trend: 0, icon: '✅' },
-      { title: 'In Progress', value: inProgress, trend: 0, icon: '🔄' },
-      { title: 'Errors', value: errors, trend: 0, icon: '❌' },
+      { title: 'Total Chunks', value: totalChunks, trend: 0, icon: '📄' },
     ];
   }, [documents]);
 
@@ -111,9 +107,21 @@ const DashboardPage: React.FC = () => {
               <p className="text-text-light">Upload your first document to get started</p>
             </div>
           ) : (
-            documents?.map(document => (
-              <DocumentCard key={document.id} document={document} />
-            ))
+            <div className="space-y-4">
+              {documents?.map(document => (
+                <DocumentCard 
+                  key={document.id} 
+                  document={{
+                    id: document.id.toString(),
+                    name: document.filename,
+                    type: document.content_type,
+                    uploadedAt: document.created_at,
+                    size: `${document.chunks.length} chunks`,
+                    status: document.chunks.length > 0 ? 'processed' : 'processing'
+                  }} 
+                />
+              ))}
+            </div>
           )}
         </div>
       </div>

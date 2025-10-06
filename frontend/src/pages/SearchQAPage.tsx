@@ -1,97 +1,121 @@
-// pages/SearchQAPage.tsx
 import React, { useState } from 'react';
 import QABox from '../components/QABox';
+import LoadingSpinner from '../components/LoadingSpinner';
 
-const SearchQAPage: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<string[]>([]);
+interface Source {
+  content: string;
+  document_id: number;
+  chunk_id: number | null;
+  score: number;
+}
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) return;
-    
-    // Simulate search results
-    setSearchResults([
-      `Document 1: Found content related to "${searchQuery}"`,
-      `Document 2: Additional information about "${searchQuery}"`,
-      `Document 3: Reference to "${searchQuery}" in section 4.2`,
-    ]);
-  };
+interface QueryResult {
+  answer: string;
+  sources: Source[];
+}
 
-  const handleAskQuestion = async (question: string): Promise<string> => {
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    return `Across all documents, the answer to "${question}" appears to be that multiple sources confirm this information.`;
+const API_BASE_URL = 'http://localhost:8000';
+
+const QAPage: React.FC = () => {
+  const [messages, setMessages] = useState<
+    { type: 'user' | 'bot'; text: string; sources?: Source[] }[]
+  >([]);
+  const [isQaLoading, setIsQaLoading] = useState(false);
+  const [qaError, setQaError] = useState<string | null>(null);
+
+  const handleAskQuestion = async (question: string) => {
+    if (!question.trim()) return;
+
+    // Add user message
+    setMessages((prev) => [...prev, { type: 'user', text: question }]);
+    setIsQaLoading(true);
+    setQaError(null);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/query/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: question, limit: 5 }),
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.detail || 'An error occurred while fetching the answer.');
+      }
+
+      // ✅ API returns a list of dicts, so always expect an array
+      const data: QueryResult[] = await response.json();
+
+      if (data && data.length > 0) {
+        const result = data[0]; // Take the first answer
+        setMessages((prev) => [
+          ...prev,
+          { type: 'bot', text: result.answer, sources: result.sources },
+        ]);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          { type: 'bot', text: 'No answer could be generated from the documents.' },
+        ]);
+      }
+    } catch (error: any) {
+      setQaError(error.message);
+    } finally {
+      setIsQaLoading(false);
+    }
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-textDark">Search & Q&A</h1>
-        <p className="text-textDark/70">Search across all documents or ask questions</p>
+    <div className="flex flex-col h-screen bg-gray-50">
+      {/* Chat Window */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-4">
+        {messages.map((msg, i) => (
+          <div
+            key={i}
+            className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
+          >
+            <div
+              className={`max-w-lg p-3 rounded-lg shadow ${
+                msg.type === 'user'
+                  ? 'bg-primary text-white'
+                  : 'bg-white text-gray-800 border'
+              }`}
+            >
+              <p className="whitespace-pre-wrap">{msg.text}</p>
+              {msg.sources && msg.sources.length > 0 && (
+                <details className="mt-2 text-sm text-gray-600">
+                  <summary className="cursor-pointer">Sources</summary>
+                  <ul className="mt-1 space-y-1 list-disc list-inside">
+                    {msg.sources.map((src, idx) => (
+                      <li key={idx} className="font-mono bg-gray-100 p-1 rounded">
+                        {src.content}
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              )}
+            </div>
+          </div>
+        ))}
+
+        {isQaLoading && (
+          <div className="flex items-center space-x-2 text-gray-500">
+            <LoadingSpinner />
+            <span>Generating answer...</span>
+          </div>
+        )}
+
+        {qaError && (
+          <p className="text-error bg-error/10 p-3 rounded-lg">{qaError}</p>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-surface rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold text-textDark mb-4">Search Documents</h2>
-          
-          <form onSubmit={handleSearch} className="mb-4">
-            <div className="flex space-x-2">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Enter search terms..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <button
-                type="submit"
-                className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition-colors"
-              >
-                Search
-              </button>
-            </div>
-          </form>
-          
-          {searchResults.length > 0 && (
-            <div className="bg-white rounded-lg p-4 border border-gray-200">
-              <h3 className="font-medium text-textDark mb-2">Search Results:</h3>
-              <ul className="space-y-2">
-                {searchResults.map((result, index) => (
-                  <li key={index} className="text-textDark/80 text-sm">
-                    • {result}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-
-        <div className="bg-surface rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold text-textDark mb-4">Cross-Document Q&A</h2>
-          <QABox onAskQuestion={handleAskQuestion} />
-        </div>
-      </div>
-
-      <div className="bg-surface rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold text-textDark mb-4">Recent Queries</h2>
-        <div className="space-y-2">
-          <div className="flex justify-between items-center p-3 bg-white rounded-lg">
-            <span className="text-textDark">What are the payment terms?</span>
-            <span className="text-xs text-textDark/50">2 days ago</span>
-          </div>
-          <div className="flex justify-between items-center p-3 bg-white rounded-lg">
-            <span className="text-textDark">Contract expiration dates</span>
-            <span className="text-xs text-textDark/50">5 days ago</span>
-          </div>
-          <div className="flex justify-between items-center p-3 bg-white rounded-lg">
-            <span className="text-textDark">Parties involved in agreement</span>
-            <span className="text-xs text-textDark/50">1 week ago</span>
-          </div>
-        </div>
+      {/* Input Box */}
+      <div className="p-4 border-t bg-white">
+        <QABox onAskQuestion={handleAskQuestion} isLoading={isQaLoading} />
       </div>
     </div>
   );
 };
 
-export default SearchQAPage;
+export default QAPage;

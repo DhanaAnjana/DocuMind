@@ -1,27 +1,33 @@
 // hooks/useDocuments.ts
 import { useQuery } from '@tanstack/react-query';
 
-export interface Document {
-  id: string;
-  name: string;
-  status: 'queued' | 'processing' | 'processed' | 'error';
-  uploadedAt: string;
-  size: string;
-  type: string;
+interface Chunk {
+  content: string;
+  chunk_index: number;
+  embedding_id: string;
+  id: number;
+  document_id: number;
+  created_at: string;
 }
 
-// Mock API function - replace with actual API call
+export interface Document {
+  filename: string;
+  content_type: string;
+  id: number;
+  file_path: string;
+  created_at: string;
+  updated_at: string;
+  chunks: Chunk[];
+}
+
+const API_BASE_URL = 'http://localhost:8000';
+
 const fetchDocuments = async (): Promise<Document[]> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  return [
-    { id: '1', name: 'Contract_2024.pdf', status: 'processed', uploadedAt: '2023-10-12', size: '2.4 MB', type: 'PDF' },
-    { id: '2', name: 'Invoice_Jan.pdf', status: 'processing', uploadedAt: '2023-10-10', size: '1.2 MB', type: 'PDF' },
-    { id: '3', name: 'Report_01.pdf', status: 'queued', uploadedAt: '2023-10-08', size: '3.7 MB', type: 'PDF' },
-    { id: '4', name: 'Financial_Report_Q3.pdf', status: 'processed', uploadedAt: '2023-10-05', size: '4.1 MB', type: 'PDF' },
-    { id: '5', name: 'Agreement.docx', status: 'error', uploadedAt: '2023-10-01', size: '0.8 MB', type: 'DOCX' },
-  ];
+  const response = await fetch(`${API_BASE_URL}/documents/`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch documents');
+  }
+  return response.json();
 };
 
 export const useDocuments = () => {
