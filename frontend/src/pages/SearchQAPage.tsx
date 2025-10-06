@@ -43,11 +43,10 @@ const QAPage: React.FC = () => {
         throw new Error(errData.detail || 'An error occurred while fetching the answer.');
       }
 
-      // ✅ API returns a list of dicts, so always expect an array
       const data: QueryResult[] = await response.json();
 
       if (data && data.length > 0) {
-        const result = data[0]; // Take the first answer
+        const result = data[0]; // take first result
         setMessages((prev) => [
           ...prev,
           { type: 'bot', text: result.answer, sources: result.sources },
@@ -68,31 +67,38 @@ const QAPage: React.FC = () => {
   return (
     <div className="flex flex-col h-screen bg-gray-50">
       {/* Chat Window */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
+      <div className="flex-1 overflow-y-auto p-6 space-y-6">
         {messages.map((msg, i) => (
           <div
             key={i}
             className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-lg p-3 rounded-lg shadow ${
+              className={`max-w-xl p-4 rounded-lg shadow ${
                 msg.type === 'user'
                   ? 'bg-primary text-white'
                   : 'bg-white text-gray-800 border'
               }`}
             >
               <p className="whitespace-pre-wrap">{msg.text}</p>
-              {msg.sources && msg.sources.length > 0 && (
-                <details className="mt-2 text-sm text-gray-600">
-                  <summary className="cursor-pointer">Sources</summary>
-                  <ul className="mt-1 space-y-1 list-disc list-inside">
-                    {msg.sources.map((src, idx) => (
-                      <li key={idx} className="font-mono bg-gray-100 p-1 rounded">
-                        {src.content}
-                      </li>
-                    ))}
-                  </ul>
-                </details>
+
+              {/* Show sources directly below bot answer */}
+              {msg.type === 'bot' && msg.sources && msg.sources.length > 0 && (
+                <div className="mt-3 border-t pt-3 space-y-3">
+                  <p className="font-semibold text-sm text-gray-600">Relevant Chunks:</p>
+                  {msg.sources.map((src, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-gray-50 border rounded-lg p-2 text-xs text-gray-700"
+                    >
+                      <p className="mb-1 font-mono whitespace-pre-wrap">{src.content}</p>
+                      <div className="text-[10px] text-gray-500">
+                        Doc ID: {src.document_id} | Chunk: {src.chunk_id ?? 'N/A'} | Score:{' '}
+                        {src.score.toFixed(3)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </div>
