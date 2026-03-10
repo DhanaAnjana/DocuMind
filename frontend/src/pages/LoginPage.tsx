@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useAuthContext } from '../contexts/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
+import GoogleLoginButton from '../components/GoogleLoginButton';
 
 const LoginPage: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -155,30 +156,34 @@ const LoginPage: React.FC = () => {
                 isLogin ? 'Sign In' : 'Create Account'
               )}
             </button>
+
+            {isLogin && (
+              <button
+                onClick={handleDemoLogin}
+                disabled={loading}
+                className="w-full mt-4 border-2 border-primary text-primary py-3 rounded-lg font-medium hover:bg-primary/5 transition-colors disabled:opacity-50"
+              >
+                Try Demo Account
+              </button>
+            )}
+
+            <div className="mt-6 text-center">
+              <button
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setError('');
+                  setFormData({ email: '', password: '', name: '', confirmPassword: '' });
+                }}
+                disabled={loading}
+                className="text-accent hover:text-blue-600 font-medium transition-colors"
+              >
+                {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+              </button>
+            </div>
           </div>
 
-          {isLogin && (
-            <button
-              onClick={handleDemoLogin}
-              disabled={loading}
-              className="w-full mt-4 border-2 border-primary text-primary py-3 rounded-lg font-medium hover:bg-primary/5 transition-colors disabled:opacity-50"
-            >
-              Try Demo Account
-            </button>
-          )}
-
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => {
-                setIsLogin(!isLogin);
-                setError('');
-                setFormData({ email: '', password: '', name: '', confirmPassword: '' });
-              }}
-              disabled={loading}
-              className="text-accent hover:text-blue-600 font-medium transition-colors"
-            >
-              {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
-            </button>
+          <div className="mt-6">
+            <GoogleLoginButton />
           </div>
         </div>
       </div>

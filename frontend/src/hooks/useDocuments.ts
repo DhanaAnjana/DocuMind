@@ -23,7 +23,7 @@ export interface Document {
 const API_BASE_URL = 'http://localhost:8000';
 
 const fetchDocuments = async (): Promise<Document[]> => {
-  const response = await fetch(`${API_BASE_URL}/documents/`);
+  const response = await fetch(`${API_BASE_URL}/api/documents`);
   if (!response.ok) {
     throw new Error('Failed to fetch documents');
   }

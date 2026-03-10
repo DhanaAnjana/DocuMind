@@ -11,7 +11,7 @@ const uploadDocument = async (file: File): Promise<Document> => {
   const formData = new FormData();
   formData.append('file', file); // The key 'file' must match what the backend endpoint expects.
 
-  const response = await fetch(`${API_BASE_URL}/documents/`, {
+  const response = await fetch(`${API_BASE_URL}/api/documents/upload`, {
     method: 'POST',
     body: formData,
     // Note: Do not set the 'Content-Type' header manually when using FormData with fetch.
